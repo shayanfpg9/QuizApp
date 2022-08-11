@@ -1,0 +1,16 @@
+{
+    "questions": [
+        {
+            "title" : "what is your name ?",
+            "input" : "text"
+        },
+        {
+            "title": "you can fly ?",
+            "input" : "radio"
+        },
+        {
+            "title": "you're human ?",
+            "input" : "radio"
+        }
+    ]
+}

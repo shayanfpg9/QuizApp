@@ -1,0 +1,29 @@
+{
+    "answers": [
+        {
+            "options": "your name",
+            "error": "please don't write the example and fill the form",
+            "information": true
+        },
+        {
+            "options": [
+                "yes",
+                "no"
+            ],
+            "correct": 1,
+            "error": "please write s.th",
+            "true": "me too",
+            "false": "really you can fly !"
+        },
+        {
+            "options": [
+                "yes",
+                "no"
+            ],
+            "correct": 0,
+            "error": "please write s.th",
+            "true": "yes we're human",
+            "false": "omg you are animal"
+        }
+    ]
+}
