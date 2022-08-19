@@ -2,8 +2,8 @@
 import { $, validateForm, getNextQuestion, data } from "./functions.js";
 
 const form = $("form.exam"),
-  contentBox = $("form.exam>#content"),
-  answers = [];
+  contentBox = $("form.exam>#content");
+let answers = [];
 
 let correct,
   texts,
@@ -12,8 +12,8 @@ let correct,
   last = false;
 
 data.contentBox = contentBox;
-data.questionsUrl = "./dist/json/questions.json";
-data.answersUrl = "./dist/json/answers.json";
+data.questionsUrl = "./json/questions.json";
+data.answersUrl = "./json/answers.json";
 
 function saveAnswer() {
   const answer = $(`[name=input-q${data.question}]`, (result) => {
@@ -34,14 +34,27 @@ function saveAnswer() {
 
   answers.push({
     answer: answer,
-    title : title,
+    title: title,
     correct: correct,
     information: information,
     feedbacks: texts,
   });
 
   if (last) {
-    showResult();
+    const DBName = Math.random() * Math.random() * Math.PI * 1000 + 10;
+    localStorage.setItem("solved", DBName);
+
+    const DB = indexedDB.open(DBName, 4);
+    DB.onupgradeneeded = ({ target }) => {
+      const { result } = target,
+        store = result.createObjectStore("answers", { autoIncrement: true });
+
+      answers.forEach((answer) => {
+        store.add(answer);
+      });
+
+      showResult();
+    };
   }
 }
 
@@ -57,7 +70,7 @@ function submit(event) {
     form.classList.remove("was-validated");
 
     getNextQuestion({
-      function: (Qtitle,c, options, text, l, isInformation) => {
+      function: (Qtitle, c, options, text, l, isInformation) => {
         correct = c;
         texts = text;
         title = Qtitle;
@@ -69,16 +82,6 @@ function submit(event) {
 }
 
 form.addEventListener("submit", submit);
-
-getNextQuestion({
-  function: (Qtitle,c, options, text, l, isInformation) => {
-    correct = c;
-    texts = text;
-    title = Qtitle;
-    last = l;
-    information = isInformation;
-  },
-});
 
 function showResult() {
   let all = answers,
@@ -168,8 +171,6 @@ function showResult() {
       false
     );
 
-    console.log(mistakeAngle);
-
     ctx.fill();
 
     ctx.closePath();
@@ -210,5 +211,30 @@ function showResult() {
      </p>
     </div>
     `;
+  });
+}
+
+const DBName = localStorage.getItem("solved") || 0;
+if (Number(DBName) && +DBName != 0) {
+  const DB = indexedDB.open(DBName, 4);
+  DB.onsuccess = () => {
+    const transaction = DB.result.transaction(["answers"], "readwrite"),
+      objectStore = transaction.objectStore("answers"),
+      request = objectStore.getAll();
+
+    request.onsuccess = () => {
+      answers = request.result;
+      showResult();
+    };
+  };
+} else {
+  getNextQuestion({
+    function: (Qtitle, c, options, text, l, isInformation) => {
+      correct = c;
+      texts = text;
+      title = Qtitle;
+      last = l;
+      information = isInformation;
+    },
   });
 }
