@@ -129,15 +129,29 @@ function showResult() {
     color = "danger";
   }
 
-  $(".card-header").classList.replace("text-bg-primary", `text-bg-${color}`);
-  $(".card").classList.replace("border-primary", `border-${color}`);
-  canvasParent.classList.add("float-start");
-  contentParent.classList.add("float-start");
-
+  canvasParent.innerHTML += `
+  <div style="height : 20px;width:4rem">
+      <div class="color-navigator bg-danger rounded pill me-1 float-start"></div>
+      <span style="margin-top:-5px" class="text-muted float-start">${Math.floor(
+        (mistakes * 100) / all.length
+      )}%</span>
+    </div>
+    <div style="height : 20px;width:4rem">
+      <div class="color-navigator bg-success rounded pill me-1 float-start"></div>
+      <span style="margin-top:-5px" class="text-muted float-start">${Math.floor(
+        (score * 100) / all.length
+      )}%</span>
+    </div>`;
   canvasParent.appendChild(canvas);
   body.appendChild(canvasParent);
   body.appendChild(contentParent);
   body.style.padding = padding;
+
+  $(".card-header").classList.replace("text-bg-primary", `text-bg-${color}`);
+  $(".card").classList.replace("border-primary", `border-${color}`);
+  canvasParent.classList.add("float-start");
+  // canvasParent.classList.add("col-sm-12");
+  contentParent.classList.add("float-end");
 
   canvas.width = (rad + 10) * 2;
   canvas.height = (rad + 10) * 2;
@@ -176,33 +190,28 @@ function showResult() {
     ctx.closePath();
   }
 
-  contentParent.style.width = body.clientWidth - (rad + 10) * 3;
+  addEventListener("resize", () => {
+    if (window.innerWidth >= 430) {
+      contentParent.style.width = body.clientWidth - (rad + 10) * 3;
+    } else {
+      contentParent.style.width =
+        body.clientWidth - 30 /* the body padding + .card-body padding*/;
+    }
+  });
+
+  if (window.innerWidth >= 430) {
+    contentParent.style.width = body.clientWidth - (rad + 10) * 3;
+  } else {
+    contentParent.style.width =
+      body.clientWidth - 30 /* the body padding + .card-body padding*/;
+  }
   contentParent.style.height = "auto";
 
-  contentParent.innerHTML = `
-  <div class="col-4">
-    <div style="height : 20px" class="col-6 float-start">
-      <div class="color-navigator bg-danger rounded pill me-1 float-start"></div>
-      <span style="margin-top:-5px" class="text-muted float-start">${Math.floor(
-        (mistakes * 100) / all.length
-      )}%</span>
-    </div>
-    <div style="height : 20px" class="col-6 float-start">
-      <div class="color-navigator bg-success rounded pill me-1 float-start"></div>
-      <span style="margin-top:-5px" class="text-muted float-start">${Math.floor(
-        (score * 100) / all.length
-      )}%</span>
-    </div>
-  </div>
-     <div class="col-8 float-end feedbacks">
-  </div>
-  `;
-
   all.forEach((answer, i) => {
-    $(".feedbacks").innerHTML += `
+    contentParent.innerHTML += `
     <div class="text-bg-${
       answer.answer == answer.correct ? "success" : "danger"
-    } rounded shadow p-2">
+    } rounded shadow d-block p-2 ${i > 0 ? "mt-2" : ""}">
      <h3 class="fs-5">${answer.title}</h3>
      <h4 class="fs-6 ms-2">for question ${i + 1}</h4>
      <hr class="divider"/>
