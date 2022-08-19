@@ -43,7 +43,7 @@ function saveAnswer() {
   if (last) {
     const DBName = Math.random() * Math.random() * Math.PI * 1000 + 10;
     localStorage.setItem("solved", DBName);
-debugger
+
     const DB = indexedDB.open(DBName, 4);
     DB.onupgradeneeded = ({ target }) => {
       const { result } = target,
