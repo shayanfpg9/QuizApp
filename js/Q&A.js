@@ -1,9 +1,11 @@
 "use strict";
-import { $, validateForm, getNextQuestion, data } from "./functions.js";
+import { $, validateForm, getNextQuestion, data , allIsInfo} from "./functions.js";
 
 const form = $("form.exam"),
   contentBox = $("form.exam>#content");
-let answers = [];
+let answers = [],
+  DBName = localStorage.getItem("solved") || 0,
+  DB;
 
 let correct,
   texts,
@@ -40,21 +42,24 @@ function saveAnswer() {
     feedbacks: texts,
   });
 
+  localStorage.setItem("index", answers.length - 1);
+
+  DB = indexedDB.open(DBName, 4);
+  DB.onsuccess = () => {
+    const transaction = DB.result.transaction(["answers"], "readwrite"),
+      store = transaction.objectStore("answers");
+    store.add({
+      answer: answer,
+      title: title,
+      correct: correct,
+      information: information,
+      feedbacks: texts,
+    });
+  };
+
   if (last) {
-    const DBName = Math.random() * Math.random() * Math.PI * 1000 + 10;
-    localStorage.setItem("solved", DBName);
-
-    const DB = indexedDB.open(DBName, 4);
-    DB.onupgradeneeded = ({ target }) => {
-      const { result } = target,
-        store = result.createObjectStore("answers", { autoIncrement: true });
-
-      answers.forEach((answer) => {
-        store.add(answer);
-      });
-
-      showResult();
-    };
+    localStorage.setItem("index", "done");
+    showResult();
   }
 }
 
@@ -84,52 +89,53 @@ function submit(event) {
 form.addEventListener("submit", submit);
 
 function showResult() {
-  let all = answers,
-    mistakes = all.length;
+  if (!allIsInfo(answers)) {
+    let all = answers,
+      mistakes = all.length;
 
-  answers.forEach((answer) => {
-    if (!answer.information) {
-      let questionStatus = false;
+    answers.forEach((answer) => {
+      if (!answer.information) {
+        let questionStatus = false;
 
-      if (answer.correct == null) {
-        questionStatus = true;
-      } else {
-        if (answer.correct == answer.answer) {
+        if (answer.correct == null) {
           questionStatus = true;
+        } else {
+          if (answer.correct == answer.answer) {
+            questionStatus = true;
+          }
         }
-      }
 
-      if (questionStatus) {
+        if (questionStatus) {
+          mistakes--;
+        }
+      } else {
+        all = all.filter((val) => {
+          if (val.answer != answer.answer) return val;
+        });
         mistakes--;
       }
-    } else {
-      all = all.filter((val) => {
-        if (val.answer != answer.answer) return val;
-      });
-      mistakes--;
+    });
+
+    const body = $(".card-body"),
+      canvasParent = document.createElement("div"),
+      contentParent = document.createElement("div"),
+      canvas = document.createElement("canvas"),
+      ctx = canvas.getContext("2d"),
+      score = all.length - mistakes,
+      padding = 15,
+      mistakeAngle = (Math.PI * 2 * mistakes) / all.length,
+      rad = 60;
+    let color = "success";
+
+    body.removeChild(form);
+    $(".card-title").innerHTML = "the result of the exam";
+    $(".card-subtitle").innerHTML = "score: " + score + "/" + all.length;
+
+    if ((score * 100) / all.length < 75) {
+      color = "danger";
     }
-  });
 
-  const body = $(".card-body"),
-    canvasParent = document.createElement("div"),
-    contentParent = document.createElement("div"),
-    canvas = document.createElement("canvas"),
-    ctx = canvas.getContext("2d"),
-    score = all.length - mistakes,
-    padding = 15,
-    mistakeAngle = (Math.PI * 2 * mistakes) / all.length,
-    rad = 60;
-  let color = "success";
-
-  body.removeChild(form);
-  $(".card-title").innerHTML = "the result of the exam";
-  $(".card-subtitle").innerHTML = "score: " + score + "/" + all.length;
-
-  if ((score * 100) / all.length < 75) {
-    color = "danger";
-  }
-
-  canvasParent.innerHTML += `
+    canvasParent.innerHTML += `
   <div style="height : 20px;width:4rem">
       <div class="color-navigator bg-danger rounded pill me-1 float-start"></div>
       <span style="margin-top:-5px" class="text-muted float-start">${Math.floor(
@@ -142,73 +148,73 @@ function showResult() {
         (score * 100) / all.length
       )}%</span>
     </div>`;
-  canvasParent.appendChild(canvas);
-  body.appendChild(canvasParent);
-  body.appendChild(contentParent);
-  body.style.padding = padding;
+    canvasParent.appendChild(canvas);
+    body.appendChild(canvasParent);
+    body.appendChild(contentParent);
+    body.style.padding = padding;
 
-  $(".card-header").classList.replace("text-bg-primary", `text-bg-${color}`);
-  $(".card").classList.replace("border-primary", `border-${color}`);
-  canvasParent.classList.add("float-start");
-  // canvasParent.classList.add("col-sm-12");
-  contentParent.classList.add("float-end");
+    $(".card-header").classList.replace("text-bg-primary", `text-bg-${color}`);
+    $(".card").classList.replace("border-primary", `border-${color}`);
+    canvasParent.classList.add("float-start");
+    // canvasParent.classList.add("col-sm-12");
+    contentParent.classList.add("float-end");
 
-  canvas.width = (rad + 10) * 2;
-  canvas.height = (rad + 10) * 2;
+    canvas.width = (rad + 10) * 2;
+    canvas.height = (rad + 10) * 2;
 
-  ctx.beginPath();
-  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(
-    "--bs-success"
-  );
-
-  ctx.arc(rad + 10, canvas.height / 2, rad, 0, Math.PI * 2, false);
-
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.closePath();
-
-  if (mistakeAngle) {
-    // debugger
     ctx.beginPath();
-
     ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(
-      "--bs-danger"
+      "--bs-success"
     );
 
-    ctx.arc(
-      rad + 10,
-      canvas.height / 2,
-      rad,
-      -(Math.PI / 2),
-      mistakeAngle - Math.PI / 2,
-      false
-    );
+    ctx.arc(rad + 10, canvas.height / 2, rad, 0, Math.PI * 2, false);
 
     ctx.fill();
 
+    ctx.beginPath();
     ctx.closePath();
-  }
 
-  addEventListener("resize", () => {
+    if (mistakeAngle) {
+      // debugger
+      ctx.beginPath();
+
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue(
+        "--bs-danger"
+      );
+
+      ctx.arc(
+        rad + 10,
+        canvas.height / 2,
+        rad,
+        -(Math.PI / 2),
+        mistakeAngle - Math.PI / 2,
+        false
+      );
+
+      ctx.fill();
+
+      ctx.closePath();
+    }
+
+    addEventListener("resize", () => {
+      if (window.innerWidth >= 430) {
+        contentParent.style.width = body.clientWidth - (rad + 10) * 3;
+      } else {
+        contentParent.style.width =
+          body.clientWidth - 30 /* the body padding + .card-body padding*/;
+      }
+    });
+
     if (window.innerWidth >= 430) {
       contentParent.style.width = body.clientWidth - (rad + 10) * 3;
     } else {
       contentParent.style.width =
         body.clientWidth - 30 /* the body padding + .card-body padding*/;
     }
-  });
+    contentParent.style.height = "auto";
 
-  if (window.innerWidth >= 430) {
-    contentParent.style.width = body.clientWidth - (rad + 10) * 3;
-  } else {
-    contentParent.style.width =
-      body.clientWidth - 30 /* the body padding + .card-body padding*/;
-  }
-  contentParent.style.height = "auto";
-
-  all.forEach((answer, i) => {
-    contentParent.innerHTML += `
+    all.forEach((answer, i) => {
+      contentParent.innerHTML += `
     <div class="text-bg-${
       answer.answer == answer.correct ? "success" : "danger"
     } rounded shadow d-block p-2 ${i > 0 ? "mt-2" : ""}">
@@ -220,12 +226,29 @@ function showResult() {
      </p>
     </div>
     `;
-  });
+    });
+  }else{
+    const body = $("#body-form");
+    body.classList.replace("card","alert")
+    body.classList.remove("border-primary")
+    body.classList.add("alert-info")
+    body.classList.add("text-center")
+
+    body.innerHTML =`
+      <h1 class="alert-heading fs-3">thank you for answering all the questions</h1>
+      <p>
+        sorry!
+        all the questions are personal information
+        so we can't show any score to you
+      </p>
+      <hr>
+      <span>for know your score ask from the quiz manager</span>
+    `
+  }
 }
 
-const DBName = localStorage.getItem("solved") || 0;
 if (Number(DBName) && +DBName != 0) {
-  const DB = indexedDB.open(DBName, 4);
+  DB = indexedDB.open(DBName, 4);
   DB.onsuccess = () => {
     const transaction = DB.result.transaction(["answers"], "readwrite"),
       objectStore = transaction.objectStore("answers"),
@@ -233,10 +256,44 @@ if (Number(DBName) && +DBName != 0) {
 
     request.onsuccess = () => {
       answers = request.result;
-      showResult();
+
+      const index = localStorage.getItem("index");
+      if (index != "done" && index != null && typeof +index == "number") {
+        getNextQuestion({
+          index: +index + 1,
+          function: (Qtitle, c, options, text, l, isInformation) => {
+            correct = c;
+            texts = text;
+            title = Qtitle;
+            last = l;
+            information = isInformation;
+          },
+        });
+      } else if (index == null) {
+        getNextQuestion({
+          function: (Qtitle, c, options, text, l, isInformation) => {
+            correct = c;
+            texts = text;
+            title = Qtitle;
+            last = l;
+            information = isInformation;
+          },
+        });
+      } else {
+        showResult();
+      }
     };
   };
 } else {
+  DBName = Math.random() * Math.random() * Math.PI * 1000 + 10;
+  localStorage.setItem("solved", DBName);
+
+  DB = indexedDB.open(DBName, 4);
+  DB.onupgradeneeded = ({ target }) => {
+    const { result } = target;
+    result.createObjectStore("answers", { autoIncrement: true });
+  };
+
   getNextQuestion({
     function: (Qtitle, c, options, text, l, isInformation) => {
       correct = c;
@@ -247,3 +304,9 @@ if (Number(DBName) && +DBName != 0) {
     },
   });
 }
+
+addEventListener("offline", () => {
+  alert(
+    "You are offline\nBut we store the answers in the cloud, so don't worry and answer the questions\nWe post the answers when you go online"
+  );
+});

@@ -298,7 +298,7 @@ export function getNextQuestion(
 ) {
   const index = attr.index || data.question,
     func = attr.function || function () {},
-    question = data.question;
+    question = attr.index || data.question;
 
   fetch(data.questionsUrl)
     .then((response) => response.json())
@@ -438,4 +438,16 @@ export function getNextQuestion(
           });
       }
     });
+}
+
+export function allIsInfo(answers) {
+  const informations = [];
+
+  answers.forEach((answer, i) => {
+    if (answer.information == true) {
+      informations.push(i);
+    }
+  });
+
+  return informations.length == answers.length;
 }
