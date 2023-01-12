@@ -5,11 +5,11 @@
             "input" : "text"
         },
         {
-            "title": "you can fly ?",
+            "title": "can you fly ?",
             "input" : "radio"
         },
         {
-            "title": "you're human ?",
+            "title": "are you human ?",
             "input" : "radio"
         }
     ]
