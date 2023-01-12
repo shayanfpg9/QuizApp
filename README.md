@@ -3,3 +3,9 @@
 this quiz app written with javascript and used bootstrap for better design
 <br/>
 <a href="https://shayanfpg9.github.io/QuizApp/">see demo</a>
+
+# new:
+- [ ] bigger
+- [ ] new inputs
+- [ ] fix some bugs
+- [ ] etc
