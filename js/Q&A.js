@@ -19,18 +19,22 @@ data.answersUrl = "./json/answers.json";
 
 function saveAnswer() {
   const answer = $(`[name=input-q${data.question}]`, (result) => {
-    if (result.length > 1) {
-      let response = "";
+    try {
+      if (result.length > 1) {
+        let response = "";
 
-      result.forEach((el) => {
-        if (el.checked) {
-          response = el.value;
-        }
-      });
+        result.forEach((el) => {
+          if (el.checked) {
+            response = el.value;
+          }
+        });
 
-      return response;
-    } else {
-      return result.value;
+        return response;
+      } else {
+        return result.value;
+      }
+    } catch(e) {
+      return null;
     }
   });
 
