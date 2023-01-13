@@ -323,3 +323,7 @@ addEventListener("offline", () => {
     "You are offline\nBut we store the answers in the cloud, so don't worry and answer the questions\nWe post the answers when you go online"
   );
 });
+
+addEventListener("resize", () => {
+  window.location.reload();
+});
