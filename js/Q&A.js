@@ -54,16 +54,18 @@ function saveAnswer() {
   localStorage.setItem("index", answers.length - 1);
 
   DB = indexedDB.open(DBName, 4);
+  const SaveDatas = {
+    answer: answer,
+    title: title,
+    correct: correct,
+    information: information,
+    feedbacks: texts,
+  };
+
   DB.onsuccess = () => {
     const transaction = DB.result.transaction(["answers"], "readwrite"),
       store = transaction.objectStore("answers");
-    store.add({
-      answer: answer,
-      title: title,
-      correct: correct,
-      information: information,
-      feedbacks: texts,
-    });
+    store.add(SaveDatas);
   };
 
   if (last) {

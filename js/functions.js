@@ -442,19 +442,22 @@ export function getNextQuestion(
 
     ++data.index;
 
+    const correct =
+      typeof answer.correct == "object"
+        ? answer.correct.answer || answer.correct
+        : Array.isArray(answer.options)
+        ? typeof answer.correct == "number"
+          ? answer.options[answer.correct]
+          : answer.correct
+        : answer.correct || null;
+
     func(
       title,
-      typeof answer.correct != "boolean"
-        ? Array.isArray(answer.options)
-          ? typeof answer.correct == "number"
-            ? answer.options[answer.correct]
-            : answer.correct
-          : answer.correct
-        : null,
+      correct,
       answer.options,
       feedback,
       questions.length == index + 1,
-      typeof answer.information != "boolean" ? false : answer.information
+      Boolean(answer.information)
     );
   }
 }
