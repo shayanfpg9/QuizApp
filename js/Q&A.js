@@ -1,5 +1,11 @@
 "use strict";
-import { $, validateForm, getNextQuestion, data , allIsInfo} from "./functions.js";
+import {
+  $,
+  validateForm,
+  getNextQuestion,
+  data,
+  allIsInfo,
+} from "./functions.js";
 
 const form = $("form.exam"),
   contentBox = $("form.exam>#content");
@@ -14,11 +20,10 @@ let correct,
   last = false;
 
 data.contentBox = contentBox;
-data.questionsUrl = "./json/questions.json";
-data.answersUrl = "./json/answers.json";
+await data.LoadQuestions("./json/%NAME%.json");
 
 function saveAnswer() {
-  const answer = $(`[name=input-q${data.question}]`, (result) => {
+  const answer = $(`[name=input-q${data.index}]`, (result) => {
     try {
       if (result.length > 1) {
         let response = "";
@@ -33,7 +38,7 @@ function saveAnswer() {
       } else {
         return result.value;
       }
-    } catch(e) {
+    } catch (e) {
       return null;
     }
   });
@@ -231,14 +236,14 @@ function showResult() {
     </div>
     `;
     });
-  }else{
+  } else {
     const body = $("#body-form");
-    body.classList.replace("card","alert")
-    body.classList.remove("border-primary")
-    body.classList.add("alert-info")
-    body.classList.add("text-center")
+    body.classList.replace("card", "alert");
+    body.classList.remove("border-primary");
+    body.classList.add("alert-info");
+    body.classList.add("text-center");
 
-    body.innerHTML =`
+    body.innerHTML = `
       <h1 class="alert-heading fs-3">thank you for answering all the questions</h1>
       <p>
         sorry!
@@ -247,7 +252,7 @@ function showResult() {
       </p>
       <hr>
       <span>for know your score ask from the quiz manager</span>
-    `
+    `;
   }
 }
 
