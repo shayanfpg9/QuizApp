@@ -10,6 +10,21 @@
         transition: all 0.3s linear, background-color 0.1s ease;
       }
 
+      #body-form {
+        min-height: 75%;
+        max-width: 90%;
+        margin-top: 5%;
+      }
+
+      .card-header {
+        width: 110%;
+        min-height: 50%;
+        margin-top: -5%;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
       #content > label {
         width: calc(100% - 1rem);
         padding-left: 0.5rem;
@@ -40,11 +55,10 @@
   >
     <div
       id="body-form"
-      style="min-height: 75%;"
       class="card shadow border-primary col-12 col-lg-8 col-md-10 rounded-3"
     >
       <div
-        class="card-header text-center text-bg-primary border-bottom-0 rounded-2 h-25 d-flex flex-wrap align-items-center"
+        class="card-header text-center text-bg-primary border-bottom-0 rounded-2 d-flex flex-wrap align-items-center"
       >
         <h1 class="card-title col-12"></h1>
         <h2 class="card-subtitle fs-5 col-12">
