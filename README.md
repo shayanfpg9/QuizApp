@@ -5,7 +5,9 @@ this quiz app written with javascript and used bootstrap for better design
 <a href="https://shayanfpg9.github.io/QuizApp/">see demo</a>
 
 # new:
-- [ ] bigger
-- [ ] new inputs
-- [ ] fix some bugs
+- [x] bigger
+- [x] new inputs
+- [x] fix some bugs
+- [ ] random answers
+- [ ] make it flexible for longer questions
 - [ ] etc
