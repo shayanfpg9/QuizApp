@@ -183,12 +183,11 @@ export class validateForm {
     }
   }
 
-  between(
-    from = +this.element.getAttribute("aria-valuemin") || 0,
-    to = +this.element.getAttribute("aria-valuemax") || 10
-  ) {
+  between(from = +this.element.min, to = +this.element.max) {
     const value = +this.element.value;
 
+    if (!from) from = value - 1;
+    if (!to) to = value + 1;
     if (value <= from && value > to) {
       this.mistakes.push({
         status: false,
@@ -287,157 +286,177 @@ export class validateForm {
 */
 
 export const data = {
-  questionsUrl: "",
-  answersUrl: "",
+  questions: [],
+  answers: [],
   contentBox: "",
-  question: 0,
+  index: 0,
+  LoadQuestions: async (url) => {
+    fetch(url.replace("%NAME%", "questions"))
+      .then((response) => response.json())
+      .then(({ questions }) => {
+        data.questions = questions;
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    fetch(url.replace("%NAME%", "answers"))
+      .then((response) => response.json())
+      .then(({ answers }) => {
+        data.answers = answers;
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    data.LoadQuestions = undefined;
+  },
 };
 
 export function getNextQuestion(
-  attr = { index: data.question, function: () => {} }
+  attr = { index: data.index, function: () => {} }
 ) {
-  const index = attr.index || data.question,
+  const index = attr.index || data.index,
     func = attr.function || function () {},
-    question = attr.index || data.question;
+    { questions } = data;
 
-  fetch(data.questionsUrl)
-    .then((response) => response.json())
-    .then(({ questions }) => {
-      if (questions[index]) {
-        const { title, input } = questions[index],
-          contentBox = data.contentBox;
+  if (questions[index]) {
+    const { title, input } = questions[index],
+      contentBox = data.contentBox;
 
-        let AnswerInput,
-          multi = false;
+    let AnswerInput,
+      multi = false;
 
-        $(".card-title").innerHTML = title;
-        $("#question-index").innerHTML = question + 1;
+    $(".card-title").innerHTML = title;
+    $("#question-index").innerHTML = index + 1;
 
-        switch (input) {
-          case "select":
-            AnswerInput = document.createElement("select");
-            AnswerInput.classList.add("form-select");
-            multi = true;
-            break;
+    switch (input) {
+      case "select":
+        AnswerInput = document.createElement("select");
+        AnswerInput.classList.add("form-select");
+        multi = true;
+        break;
 
-          case "textarea":
-            AnswerInput = document.createElement("textarea");
-            AnswerInput.classList.add("form-control");
+      case "textarea":
+        AnswerInput = document.createElement("textarea");
+        AnswerInput.classList.add("form-control");
+        break;
+
+      default:
+        AnswerInput = document.createElement("input");
+        AnswerInput.type = input;
+        break;
+    }
+
+    if (input == "checkbox" || input == "radio") {
+      AnswerInput.classList.add("form-check-input");
+      multi = true;
+    } else if (input != "select") {
+      AnswerInput.classList.add("form-control");
+    }
+
+    AnswerInput.name = "input-q" + (index + 1);
+
+    const answer = data.answers[index];
+    const feedback = [answer.true || "", answer.false || ""];
+
+    if (!multi) {
+      contentBox.appendChild(AnswerInput);
+
+      if (typeof answer.correct !== "object") {
+        AnswerInput.setAttribute(
+          "data-example",
+          Array.isArray(answer.options)
+            ? answer.options.join(", ").trim()
+            : answer.options
+        );
+        AnswerInput.placeholder = Array.isArray(answer.options)
+          ? answer.options.join(", ").trim()
+          : answer.options;
+      } else {
+        switch (AnswerInput.type) {
+          case "number":
+            AnswerInput.value = answer.correct.min | 0;
+            if (!!answer.correct.min) AnswerInput.min = answer.correct.min;
+            if (!!answer.correct.max) AnswerInput.max = answer.correct.max;
+            AnswerInput.step = answer.correct.step | 1;
             break;
 
           default:
-            AnswerInput = document.createElement("input");
-            AnswerInput.type = input;
             break;
         }
+      }
+    } else {
+      let parent = contentBox;
+      if (AnswerInput.tagName.toLowerCase() == "select") {
+        contentBox.appendChild(AnswerInput);
+        parent = AnswerInput;
+        AnswerInput = document.createElement("option");
+      }
 
-        if (input == "checkbox" || input == "radio") {
-          AnswerInput.classList.add("form-check-input");
-          multi = true;
-        } else if (input != "select") {
-          AnswerInput.classList.add("form-control");
+      answer.options.forEach((value, i) => {
+        AnswerInput.value = value;
+
+        const NewAnswerInput = document.createElement(
+          AnswerInput.tagName.toLowerCase()
+        );
+
+        if (parent != contentBox) {
+          AnswerInput.innerHTML = value;
+          parent.appendChild(AnswerInput);
+        } else {
+          NewAnswerInput.setAttribute("type", AnswerInput.getAttribute("type"));
+
+          NewAnswerInput.classList.add("form-check-input");
+
+          NewAnswerInput.name = "input-q" + (index + 1);
+
+          AnswerInput.id = `input-q${index + 1}-${i + 1}`;
+
+          parent.appendChild(AnswerInput);
+
+          if (
+            AnswerInput.hasAttribute("type") &&
+            AnswerInput.getAttribute("type").search("radio" || "checkbox") >= 0
+          ) {
+            const label = document.createElement("label");
+            label.classList.add("form-label");
+            label.innerHTML = value;
+            label.setAttribute("for", `input-q${index + 1}-${i + 1}`);
+
+            parent.appendChild(label);
+          }
         }
 
-        AnswerInput.name = "input-q" + (question + 1);
+        AnswerInput = NewAnswerInput;
+      });
+    }
 
-        fetch(data.answersUrl)
-          .then((response) => response.json())
-          .then(({ answers }) => {
-            const answer = answers[index],
-              feedback = [answer.true || "", answer.false || ""];
+    if (typeof answer.correct == "number" || answer.correct != false) {
+      const element = document.createElement("span");
+      element.innerText = answer.error;
+      contentBox.appendChild(element);
 
-            if (!multi) {
-              contentBox.appendChild(AnswerInput);
-              AnswerInput.setAttribute(
-                "data-example",
-                Array.isArray(answer.options)
-                  ? answer.options.join(",")
-                  : answer.options
-              );
-              AnswerInput.placeholder = Array.isArray(answer.options)
-                ? answer.options.join(",")
-                : answer.options;
-            } else {
-              let parent = contentBox;
-              if (AnswerInput.tagName.toLowerCase() == "select") {
-                contentBox.appendChild(AnswerInput);
-                parent = AnswerInput;
-                AnswerInput = document.createElement("option");
-              }
+      element.classList.add("invalid-feedback");
+    }
 
-              answer.options.forEach((value, i) => {
-                AnswerInput.value = value;
+    ++data.index;
 
-                const NewAnswerInput = document.createElement(
-                  AnswerInput.tagName.toLowerCase()
-                );
-
-                if (parent != contentBox) {
-                  AnswerInput.innerHTML = value;
-                  parent.appendChild(AnswerInput);
-                } else {
-                  NewAnswerInput.setAttribute(
-                    "type",
-                    AnswerInput.getAttribute("type")
-                  );
-
-                  NewAnswerInput.classList.add("form-check-input");
-
-                  NewAnswerInput.name = "input-q" + (question + 1);
-
-                  AnswerInput.id = `input-q${question + 1}-${i + 1}`;
-
-                  parent.appendChild(AnswerInput);
-
-                  if (
-                    AnswerInput.hasAttribute("type") &&
-                    AnswerInput.getAttribute("type").search(
-                      "radio" || "checkbox"
-                    ) >= 0
-                  ) {
-                    const label = document.createElement("label");
-                    label.classList.add("form-label");
-                    label.innerHTML = value;
-                    label.setAttribute(
-                      "for",
-                      `input-q${question + 1}-${i + 1}`
-                    );
-
-                    parent.appendChild(label);
-                  }
-                }
-
-                AnswerInput = NewAnswerInput;
-              });
-            }
-
-            if (typeof answer.correct == "number" || answer.correct != false) {
-              const element = document.createElement("span");
-              element.innerText = answer.error;
-              contentBox.appendChild(element);
-
-              element.classList.add("invalid-feedback");
-            }
-
-            ++data.question;
-
-            func(
-              title,
-              typeof answer.correct != "boolean"
-                ? Array.isArray(answer.options)
-                  ? answer.options[answer.correct]
-                  : answer.correct
-                : null,
-              answer.options,
-              feedback,
-              questions.length == index + 1,
-              typeof answer.information != "boolean"
-                ? false
-                : answer.information
-            );
-          });
-      }
-    });
+    func(
+      title,
+      typeof answer.correct != "boolean"
+        ? Array.isArray(answer.options)
+          ? typeof answer.correct == "number"
+            ? answer.options[answer.correct]
+            : answer.correct
+          : answer.correct
+        : null,
+      answer.options,
+      feedback,
+      questions.length == index + 1,
+      typeof answer.information != "boolean" ? false : answer.information
+    );
+  }
 }
 
 export function allIsInfo(answers) {
