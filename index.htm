@@ -6,6 +6,10 @@
     <title>Quiz App with Js</title>
 
     <style>
+      * {
+        transition: all 0.3s linear, background-color 0.1s ease;
+      }
+
       #content > label {
         width: calc(100% - 1rem);
         padding-left: 0.5rem;
@@ -19,51 +23,48 @@
       .feedbacks > *:not(:first-child) {
         margin-top: 1rem;
       }
+
+      .middle-x {
+        margin-left: 50%;
+        transform: translateX(-50%);
+      }
+
+      input[type="text"],
+      label {
+        font-size: 1.2rem !important;
+      }
     </style>
   </head>
   <body
     class="d-flex justify-content-center align-items-center bg-light container-fluid p-2"
   >
-    <div id="body-form" class="card shadow border-primary col-12 col-lg-7 col-md-10">
-      <div class="card-header text-center text-bg-primary border-bottom-0">
-        <h1 class="card-title"></h1>
-        <h2 class="card-subtitle fs-5">
+    <div
+      id="body-form"
+      class="card shadow border-primary col-12 col-lg-8 col-md-10 h-75 rounded-3"
+    >
+      <div
+        class="card-header text-center text-bg-primary border-bottom-0 rounded-2 h-25 d-flex flex-wrap align-items-center"
+      >
+        <h1 class="card-title col-12"></h1>
+        <h2 class="card-subtitle fs-5 col-12">
           question <span id="question-index"></span>
         </h2>
       </div>
 
-      <div class="card-body">
-        <form class="text-center needs-validation exam" class="form" novalidate>
-          <!-- <textarea class="form-text" id="" cols="30" rows="10"></textarea> -->
+      <div
+        class="card-body d-flex align-items-center flex-wrap justify-content-center"
+      >
+        <form
+          class="text-center needs-validation exam w-100"
+          class="form"
+          novalidate
+        >
+          <div class="col-12 col-lg-10 middle-x text-start" id="content"></div>
 
-          <!-- <input placeholder="write answer" type="text" class="form-control" /> -->
-
-          <!-- <div class="valid-feedback">Looks good!</div>
-          <div class="invalid-feedback">Looks good!</div> -->
-
-          <!-- <select class="form-select">
-            <option data-default value="val-1">item 1</option>
-            <option value="val-2">item 2</option>
-            <option value="val-3">item 3</option>
-          </select> -->
-
-          <!-- <input
-            id="check"
-            name="radio"
-            type="radio"
-            class="form-check-input"
-            data-default
-          />
-          <input
-            id="check"
-            name="radio"
-            type="radio"
-            class="form-check-input"
-          /> -->
-
-          <div class="col-12 text-start" id="content"></div>
-
-          <div class="col-12" id="send">
+          <div
+            class="col-12 col-lg-7 middle-x position-absolute bottom-0 mb-3"
+            id="send"
+          >
             <button type="submit" class="btn btn-outline-success w-75 mt-2">
               send
             </button>
