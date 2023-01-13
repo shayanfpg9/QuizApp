@@ -305,15 +305,17 @@ if (Number(DBName) && +DBName != 0) {
     result.createObjectStore("answers", { autoIncrement: true });
   };
 
-  getNextQuestion({
-    function: (Qtitle, c, options, text, l, isInformation) => {
-      correct = c;
-      texts = text;
-      title = Qtitle;
-      last = l;
-      information = isInformation;
-    },
-  });
+  DB.onsuccess = () => {
+    getNextQuestion({
+      function: (Qtitle, c, options, text, l, isInformation) => {
+        correct = c;
+        texts = text;
+        title = Qtitle;
+        last = l;
+        information = isInformation;
+      },
+    });
+  };
 }
 
 addEventListener("offline", () => {
