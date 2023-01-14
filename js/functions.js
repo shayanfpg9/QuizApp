@@ -145,6 +145,7 @@ export class validateForm {
     if (
       element[0] ||
       (!element[0] &&
+        element.getAttribute("type") &&
         element.getAttribute("type").search("checkbox" || "radio") >= 0)
     ) {
       let check = false,
@@ -397,7 +398,6 @@ export function getNextQuestion(
             const precent =
               (AnswerInput.value - AnswerInput.min) /
               (AnswerInput.max - AnswerInput.min + 3);
-            console.log(precent * 100, precent * 1.5);
 
             document.body.scrollLeft;
             output.style.left = `calc(${precent * 100}% - ${precent * 1.5}em)`;
@@ -412,8 +412,6 @@ export function getNextQuestion(
         parent = AnswerInput;
         AnswerInput = document.createElement("option");
       }
-
-      console.log(randomize(answer.options));
 
       randomize(answer.options).forEach((value, i) => {
         AnswerInput.value = value;
