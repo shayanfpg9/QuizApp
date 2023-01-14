@@ -6,7 +6,7 @@ this quiz app written with javascript and used bootstrap for better design
 
 # new:
 - [x] bigger
-- [x] new inputs
+- [ ] new inputs (textare , number , range , date , password , email)
 - [x] fix some bugs
 - [x] random answers
 - [x] make it flexible for longer questions
