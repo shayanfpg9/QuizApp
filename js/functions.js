@@ -374,7 +374,7 @@ export function getNextQuestion(
           ? answer.options.join(", ").trim()
           : answer.options;
       } else {
-        if (["number", "range"].includes(AnswerInput.type)) {
+        if ((AnswerInput.type === "number", "range")) {
           AnswerInput.value = answer.correct.min | 0;
           AnswerInput.min = answer.correct.min | 0;
           AnswerInput.max = answer.correct.max | 100;
