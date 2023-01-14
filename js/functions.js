@@ -374,16 +374,35 @@ export function getNextQuestion(
           ? answer.options.join(", ").trim()
           : answer.options;
       } else {
-        switch (AnswerInput.type) {
-          case "number":
-            AnswerInput.value = answer.correct.min | 0;
-            if (!!answer.correct.min) AnswerInput.min = answer.correct.min;
-            if (!!answer.correct.max) AnswerInput.max = answer.correct.max;
-            AnswerInput.step = answer.correct.step | 1;
-            break;
+        if (["number", "range"].includes(AnswerInput.type)) {
+          AnswerInput.value = answer.correct.min | 0;
+          AnswerInput.min = answer.correct.min | 0;
+          AnswerInput.max = answer.correct.max | 100;
+          AnswerInput.step = answer.correct.step | 1;
+        }
 
-          default:
-            break;
+        if (AnswerInput.type === "range") {
+          const output = document.createElement("output");
+          output.value = AnswerInput.value;
+          output.classList.add(
+            "text-bg-primary",
+            "p-1",
+            "text-center",
+            "rounded-pill"
+          );
+          AnswerInput.oninput = ({ target }) => {
+            output.value = target.value;
+            document.body.scrollWidth;
+
+            const precent =
+              (AnswerInput.value - AnswerInput.min) /
+              (AnswerInput.max - AnswerInput.min + 3);
+            console.log(precent * 100, precent * 1.5);
+
+            document.body.scrollLeft;
+            output.style.left = `calc(${precent * 100}% - ${precent * 1.5}em)`;
+          };
+          contentBox.insertBefore(output, AnswerInput);
         }
       }
     } else {
@@ -490,6 +509,6 @@ function randomize(array) {
 }
 
 function random(not, length) {
-  const number = Math.floor(Math.random() * (length));
+  const number = Math.floor(Math.random() * length);
   return !not.includes(number) ? number : random(not, length);
 }

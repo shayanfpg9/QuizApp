@@ -48,6 +48,35 @@
       label {
         font-size: 1.2rem !important;
       }
+
+      input[type="range"] {
+        height: 0.5rem;
+        cursor: pointer;
+      }
+
+      output {
+        opacity: 1;
+        min-width: 3rem;
+        position: absolute;
+        left: 0;
+        bottom: 1.5rem;
+        margin-left: -0.1rem;
+        margin-top: 0.8rem;
+      }
+
+      output:before {
+        content: "";
+        border: 0.5rem solid transparent;
+        border-top-color: var(--bs-primary);
+        position: absolute;
+        bottom: -1rem;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      input[type="range"]:hover ~ output {
+        opacity: 1;
+      }
     </style>
   </head>
   <body
