@@ -3,82 +3,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="libs/bootstrap.min.css" />
+    <link rel="stylesheet" href="style.css">
     <title>Quiz App with Js</title>
-
-    <style>
-      * {
-        transition: all 0.3s linear, background-color 0.1s ease;
-      }
-
-      #body-form {
-        min-height: 75%;
-        max-width: 90%;
-        margin-top: 5%;
-      }
-
-      .card-header {
-        width: 110%;
-        min-height: 50%;
-        margin-top: -5%;
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      #content > label {
-        width: calc(100% - 1rem);
-        padding-left: 0.5rem;
-      }
-
-      .color-navigator {
-        width: 1rem;
-        height: 1rem;
-      }
-
-      .feedbacks > *:not(:first-child) {
-        margin-top: 1rem;
-      }
-
-      .middle-x {
-        margin-left: 50%;
-        transform: translateX(-50%);
-      }
-
-      input[type="text"],
-      label {
-        font-size: 1.2rem !important;
-      }
-
-      input[type="range"] {
-        height: 0.5rem;
-        cursor: pointer;
-      }
-
-      output {
-        opacity: 1;
-        min-width: 3rem;
-        position: absolute;
-        left: 0;
-        bottom: 1.5rem;
-        margin-left: -0.1rem;
-        margin-top: 0.8rem;
-      }
-
-      output:before {
-        content: "";
-        border: 0.5rem solid transparent;
-        border-top-color: var(--bs-primary);
-        border-bottom: none;
-        position: absolute;
-        bottom: -0.5rem;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      input[type="range"]:hover ~ output {
-        opacity: 1;
-      }
-    </style>
   </head>
   <body
     class="d-flex justify-content-center align-items-center bg-light container-fluid p-2"
