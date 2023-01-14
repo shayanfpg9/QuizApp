@@ -8,7 +8,7 @@ this quiz app written with javascript and used bootstrap for better design
 - [x] bigger
 - [x] new inputs
 - [x] fix some bugs
-- [ ] random answers
+- [x] random answers
 - [x] make it flexible for longer questions
 - [ ] send to database
 - [ ] etc

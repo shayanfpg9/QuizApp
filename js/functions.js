@@ -394,7 +394,9 @@ export function getNextQuestion(
         AnswerInput = document.createElement("option");
       }
 
-      answer.options.forEach((value, i) => {
+      console.log(randomize(answer.options));
+
+      randomize(answer.options).forEach((value, i) => {
         AnswerInput.value = value;
 
         const NewAnswerInput = document.createElement(
@@ -472,4 +474,22 @@ export function allIsInfo(answers) {
   });
 
   return informations.length == answers.length;
+}
+
+function randomize(array) {
+  const NewArray = [],
+    pushed = [];
+
+  array.forEach(() => {
+    const num = random(pushed, array.length);
+    pushed.push(num);
+    NewArray.push(array[num]);
+  });
+
+  return NewArray;
+}
+
+function random(not, length) {
+  const number = Math.floor(Math.random() * (length));
+  return !not.includes(number) ? number : random(not, length);
 }
