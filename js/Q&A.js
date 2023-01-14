@@ -5,6 +5,7 @@ import {
   getNextQuestion,
   data,
   allIsInfo,
+  message,
 } from "./functions.js";
 
 const form = $("form.exam"),
@@ -318,10 +319,33 @@ if (Number(DBName) && +DBName != 0) {
   };
 }
 
+function offline(){
+  message({
+    timer: 3,
+    pos: "top-end",
+    icon: "info",
+    title: "you're offline",
+    msg: "but we store the answers in the cloud",
+  });
+
+  addEventListener("online",()=>{
+    message({
+      timer: 3,
+      pos: "top-end",
+      icon: "success",
+      title: "you're online again",
+      msg: "",
+    });
+  })
+
+}
+
+if (!navigator.onLine) {
+  offline()
+}
+
 addEventListener("offline", () => {
-  alert(
-    "You are offline\nBut we store the answers in the cloud, so don't worry and answer the questions\nWe post the answers when you go online"
-  );
+  offline()
 });
 
 addEventListener("resize", () => {

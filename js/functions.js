@@ -510,3 +510,23 @@ function random(not, length) {
   const number = Math.floor(Math.random() * length);
   return !not.includes(number) ? number : random(not, length);
 }
+
+export function message(prop) {
+  const Toast = Swal.mixin({
+    toast: true,
+    position: prop.pos,
+    showConfirmButton: false,
+    timer: prop.timer * 1000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener("mouseenter", Swal.stopTimer);
+      toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+  });
+
+  Toast.fire({
+    icon: prop.icon,
+    title: prop.title,
+    text: prop.msg,
+  });
+}
