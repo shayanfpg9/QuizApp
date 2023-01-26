@@ -209,12 +209,14 @@ function showResult() {
     }
 
     addEventListener("resize", () => {
-      if (window.innerWidth >= 430) {
-        contentParent.style.width = body.clientWidth - (rad + 10) * 3;
-      } else {
-        contentParent.style.width =
-          body.clientWidth - 30 /* the body padding + .card-body padding*/;
-      }
+      setTimeout(() => {
+        if (window.innerWidth >= 430) {
+          contentParent.style.width = body.clientWidth - (rad + 10) * 3;
+        } else {
+          contentParent.style.width =
+            body.clientWidth - 30 /* the body padding + .card-body padding*/;
+        }
+      }, 400);
     });
 
     if (window.innerWidth >= 430) {
@@ -349,9 +351,9 @@ addEventListener("offline", () => {
   offline();
 });
 
-addEventListener("resize", () => {
-  window.location.reload();
-});
+// addEventListener("resize", () => {
+//   window.location.reload();
+// });
 
 function get(index) {
   return answers[index - 1];
@@ -437,9 +439,7 @@ function send() {
         if (typeof text == "object")
           text = text[0] + JSON.stringify(information) + text[1];
 
-          text = text.includes("%ANSWERS%")
-          ? text.split("%ANSWERS%")
-          : text;
+        text = text.includes("%ANSWERS%") ? text.split("%ANSWERS%") : text;
         if (typeof text == "object")
           text = text[0] + JSON.stringify(AllAnswers) + text[1];
 
