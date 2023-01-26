@@ -438,7 +438,7 @@ export function getNextQuestion(
 
           if (
             AnswerInput.hasAttribute("type") &&
-            AnswerInput.getAttribute("type").search("radio" || "checkbox") >= 0
+            AnswerInput.getAttribute("type").includes("radio", "checkbox") >= 0
           ) {
             const label = document.createElement("label");
             label.classList.add("form-label");
@@ -465,12 +465,12 @@ export function getNextQuestion(
 
     const correct =
       typeof answer.correct == "object"
-        ? answer.correct.answer || answer.correct
+        ? answer.correct?.answer | answer.correct
         : Array.isArray(answer.options)
         ? typeof answer.correct == "number"
           ? answer.options[answer.correct]
           : answer.correct
-        : answer.correct || null;
+        : answer.correct | null;
 
     func(
       title,
