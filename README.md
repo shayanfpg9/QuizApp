@@ -10,5 +10,11 @@ this quiz app written with javascript and used bootstrap for better design
 - [x] fix some bugs
 - [x] random answers
 - [x] make it flexible for longer questions
-- [ ] send to database
-- [ ] etc
+- [+] send to database
+- [ ] landing page
+- [ ] more security
+- [ ] customize options
+- [ ] image question and answers
+- [x] fix responsibility
+- [x] fix range bug
+- [x] etc
