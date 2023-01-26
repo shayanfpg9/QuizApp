@@ -217,7 +217,7 @@ function showResult() {
 
     addEventListener("resize", () => {
       setTimeout(() => {
-        if (window.innerWidth >= 430) {
+        if (window.innerWidth >= 550) {
           contentParent.style.width = body.clientWidth - (rad + 10) * 3;
         } else {
           contentParent.style.width =
@@ -226,7 +226,7 @@ function showResult() {
       }, 400);
     });
 
-    if (window.innerWidth >= 430) {
+    if (window.innerWidth >= 550) {
       contentParent.style.width = body.clientWidth - (rad + 10) * 3;
     } else {
       contentParent.style.width =
