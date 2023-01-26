@@ -315,6 +315,7 @@ if (Number(DBName) && +DBName != 0) {
 
       const index = localStorage.getItem("index");
       if (index != "done" && index != null && typeof +index == "number") {
+        data.index = +index + 1;
         getNextQuestion({
           index: +index + 1,
           function: (Qtitle, c, options, text, l, isInformation) => {
