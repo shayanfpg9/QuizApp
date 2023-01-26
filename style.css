@@ -47,7 +47,7 @@ input[type="range"] {
 }
 
 output {
-  opacity: 1;
+  opacity: 0;
   min-width: 3rem;
   position: absolute;
   left: 0;

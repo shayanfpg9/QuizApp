@@ -404,7 +404,7 @@ export function getNextQuestion(
             document.body.scrollLeft;
             output.style.left = `calc(${precent * 100}% - ${precent * 1.5}em)`;
           };
-          contentBox.insertBefore(output, AnswerInput);
+          contentBox.appendChild(output);
         }
       }
     } else {
