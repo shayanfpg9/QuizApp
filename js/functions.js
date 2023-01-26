@@ -287,11 +287,13 @@ export class validateForm {
 */
 
 export const data = {
+  MainUrl: "",
   questions: [],
   answers: [],
   contentBox: "",
   index: 0,
   LoadQuestions: async (url) => {
+    data.MainUrl = url;
     fetch(url.replace("%NAME%", "questions"))
       .then((response) => response.json())
       .then(({ questions }) => {
