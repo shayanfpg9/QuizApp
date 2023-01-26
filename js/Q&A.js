@@ -257,6 +257,8 @@ function showResult() {
       <span>for know your score ask from the quiz manager</span>
     `;
   }
+
+  send();
 }
 
 if (Number(DBName) && +DBName != 0) {
@@ -319,7 +321,7 @@ if (Number(DBName) && +DBName != 0) {
   };
 }
 
-function offline(){
+function offline() {
   message({
     timer: 3,
     pos: "top-end",
@@ -328,7 +330,7 @@ function offline(){
     msg: "but we store the answers in the cloud",
   });
 
-  addEventListener("online",()=>{
+  addEventListener("online", () => {
     message({
       timer: 3,
       pos: "top-end",
@@ -336,18 +338,275 @@ function offline(){
       title: "you're online again",
       msg: "",
     });
-  })
-
+  });
 }
 
 if (!navigator.onLine) {
-  offline()
+  offline();
 }
 
 addEventListener("offline", () => {
-  offline()
+  offline();
 });
 
 addEventListener("resize", () => {
   window.location.reload();
 });
+
+function get(index) {
+  return answers[index - 1];
+}
+
+function send() {
+  //make sended localhost value
+  const config = data.MainUrl.replace("%NAME%", "config");
+
+  let all = answers,
+    mistakes = all.length;
+
+  answers.forEach((answer) => {
+    if (!answer.information) {
+      let questionStatus = false;
+
+      if (answer.correct == null) {
+        questionStatus = true;
+      } else {
+        if (answer.correct == answer.answer) {
+          questionStatus = true;
+        }
+      }
+
+      if (questionStatus) {
+        mistakes--;
+      }
+    } else {
+      all = all.filter((val) => {
+        if (val.answer != answer.answer) return val;
+      });
+      mistakes--;
+    }
+  });
+
+  fetch(config)
+    .then((res) => res.json())
+    .then((data) => {
+      const { download, send } = data,
+        variables = {};
+
+      let score = all.length - mistakes;
+
+      if (data.variables != undefined) {
+        for (const name in data.variables) {
+          variables[name] = eval(data.variables[name]);
+        }
+      }
+
+      function FindSpecial(text = "", prop = {}) {
+        text = text.replace(/%NAME%/g, data.name);
+        text = text.replace(/%SCORE%/g, score | "");
+        text = text.replace(/%LENGTH%/g, answers.length | "");
+
+        const information = [],
+          AllAnswers = [];
+
+        answers.forEach((q, i) => {
+          const RetrunObj = {
+            index: i,
+          };
+
+          if (!q.information) {
+            RetrunObj.correct = q.correct == q.answer;
+
+            if (prop?.answers == "all") {
+              RetrunObj.answer = +q.answer ? +q.answer : q.answer;
+            }
+
+            AllAnswers.push(RetrunObj);
+          } else {
+            if (prop?.answers == ("all", "information")) {
+              RetrunObj.answer = +q.answer ? +q.answer : q.answer;
+            }
+
+            information.push(RetrunObj);
+          }
+        });
+
+        text = text.includes("%INFORMATION%")
+          ? text.split("%INFORMATION%")
+          : text;
+        if (typeof text == "object")
+          text = text[0] + JSON.stringify(information) + text[1];
+
+          text = text.includes("%ANSWERS%")
+          ? text.split("%ANSWERS%")
+          : text;
+        if (typeof text == "object")
+          text = text[0] + JSON.stringify(AllAnswers) + text[1];
+
+        for (const name in variables) {
+          if (text.includes(`%${name.toUpperCase()}%`))
+            text = text.replace(
+              new RegExp(`%${name.toUpperCase()}%`, "g"),
+              variables[name]
+            );
+        }
+        return text;
+      }
+
+      if (download != undefined) {
+        let json = {};
+
+        const link = document.createElement("a");
+        link.download = data.name;
+
+        json.quiz = data.name;
+
+        if (typeof download !== "object") {
+          if (typeof download == "string") link.download = download;
+
+          json.answers = answers.map((q, i) => {
+            const RetrunObj = {
+              index: i,
+              title: q.title,
+              information: q.information,
+            };
+
+            RetrunObj.answer = q.answer;
+
+            if (q.information == false) {
+              RetrunObj.correct = q.correct == q.answer;
+            }
+
+            return RetrunObj;
+          });
+        } else {
+          link.download = FindSpecial(download.file) + ".json";
+          if (download.QuizName) json.quiz = data.name;
+          if (download.examiner) json.examiner = FindSpecial(download.examiner);
+
+          if (download.score) {
+            if (download.score == true || download.score == "number") {
+              score = `${all.length - mistakes}/${all.length}`;
+            } else if (download.score == "precent") {
+              score = ((all.length - mistakes) / all.length) * 100;
+            }
+            if (download.score) json.score = score;
+          }
+
+          if (!download.information) {
+            answers = answers.filter((v) => {
+              return !v.information;
+            });
+          }
+
+          json.answers = answers.map((q, i) => {
+            const RetrunObj = {};
+
+            if (download.index) RetrunObj.index = i;
+
+            if (!q.information) {
+              RetrunObj.correct = q.correct == q.answer;
+
+              if (download.ShowAnswers) {
+                RetrunObj.answer = +q.answer ? +q.answer : q.answer;
+              }
+            } else {
+              RetrunObj.answer = +q.answer ? +q.answer : q.answer;
+            }
+
+            return RetrunObj;
+          });
+        }
+
+        link.href = CreateJSON(json);
+        link.innerText = "download your answer sheet";
+        link.classList.add("btn", "btn-success", "mt-3", "download-button");
+        $(".card-body").appendChild(link);
+      }
+
+      score = all.length - mistakes;
+
+      if (send != undefined) {
+        if (typeof send == "string") {
+          fetch(FindSpecial(send))
+            .then((res) => res.json())
+            .catch((e) => {
+              console.error(e);
+              message({
+                icon: "error",
+                title: "the answer wasn't sent",
+                msg: "check the console for more information",
+                timer: 3,
+                pos: "top-end",
+              });
+            })
+            .then((json) => {
+              if (json !== undefined) {
+                message({
+                  icon: "success",
+                  title: "we're can send answers successfully",
+                  msg: "check the console for more information",
+                  timer: 3,
+                  pos: "top-end",
+                });
+                console.log(json);
+              }
+            });
+        } else if (typeof send == "object") {
+          if (send.score) {
+            if (send.score == true || send.score == "number") {
+              score = `${all.length - mistakes}/${all.length}`;
+            } else if (send.score == "precent") {
+              score = ((all.length - mistakes) / all.length) * 100;
+            }
+          }
+
+          if (
+            !!new RegExp(
+              "^(https?:\\/\\/)?" + // protocol
+                "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+                "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+                "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                "(\\#[-a-z\\d_]*)?$",
+              "i"
+            ).test(send.to)
+          )
+            fetch(
+              decodeURI(
+                send.to + FindSpecial(send.pattern, { answers: send.answers })
+              )
+            )
+              .then((res) => res.json())
+              .catch((e) => {
+                console.error(e);
+                message({
+                  icon: "error",
+                  title: "the answer wasn't sent",
+                  msg: "check the console for more information",
+                  timer: 3,
+                  pos: "top-end",
+                });
+              })
+              .then((json) => {
+                if (json !== undefined) {
+                  message({
+                    icon: "success",
+                    title: "we're can send answers successfully",
+                    msg: "check the console for more information",
+                    timer: 3,
+                    pos: "top-end",
+                  });
+                  console.log(json);
+                }
+              });
+        }
+      }
+    });
+}
+
+function CreateJSON(data) {
+  data = JSON.stringify(data);
+  const file = new Blob([data], { type: "application/json" });
+  return URL.createObjectURL(file);
+}
