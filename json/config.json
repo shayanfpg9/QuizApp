@@ -1,0 +1,22 @@
+{
+  "name": "Quiz-1",
+  "author": "shayan",
+  "variables": {
+    "user": "get(1).answer"
+  },
+  "download": {
+    "index": true,
+    "score": "number",
+    "information": true,
+    "ShowAnswers": true,
+    "QuizName": true,
+    "examiner": "%USER%",
+    "file": "%NAME%.%USER%"
+  },
+  "send": {
+    "answers": "information",
+    "score": "precent",
+    "pattern": "?score=%SCORE%&user=%USER%&answer=%ANSWERS%&length=%LENGTH%",
+    "to": "https://example.com/"
+  }
+}
