@@ -331,7 +331,7 @@ export function getNextQuestion(
       multi = false;
 
     $(".card-title").innerHTML = title;
-    $("#question-index").innerHTML = index + 1;
+    $(".card-subtitle").innerHTML = "question " + index + 1;
 
     switch (input) {
       case "select":

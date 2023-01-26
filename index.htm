@@ -14,23 +14,25 @@
   >
     <div
       id="body-form"
-      class="card shadow border-primary col-12 col-lg-8 col-md-10 rounded-3"
+      class="card shadow col-12 col-lg-8 col-md-10 rounded-3"
     >
       <div
         class="card-header text-center text-bg-primary border-bottom-0 rounded-2 d-flex flex-wrap align-items-center"
       >
         <h1 class="card-title col-12"></h1>
-        <h2 class="card-subtitle fs-5 col-12">
-          question <span id="question-index"></span>
-        </h2>
+        <h2 class="card-subtitle fs-5 col-12"></h2>
       </div>
 
       <div
-        class="card-body d-flex align-items-center flex-wrap justify-content-center"
+        class="card-body d-flex align-items-center flex-wrap justify-content-center rounded-bottom"
       >
+        <p class="text p-5 rounded text-bg-warning d-none">
+          press here to start your exam <br />or<br />
+          press <code>space</code> key
+        </p>
+
         <form
-          class="text-center needs-validation exam w-100"
-          class="form"
+          class="form text-center needs-validation exam w-100"
           novalidate
         >
           <div class="col-12 col-lg-10 middle-x text-start" id="content"></div>

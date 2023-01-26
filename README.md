@@ -11,7 +11,7 @@ this quiz app written with javascript and used bootstrap for better design
 - [x] random answers
 - [x] make it flexible for longer questions
 - [+] send to database
-- [ ] landing page
+- [x] landing page
 - [ ] more security
 - [ ] customize options
 - [ ] image question and answers

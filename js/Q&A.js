@@ -30,6 +30,35 @@ await fetch(ConfigUrl)
     window.config = data;
   });
 
+let start = function () {
+  DBName = Math.random() * Math.random() * Math.PI * 1000 + 10;
+  localStorage.setItem("solved", DBName);
+
+  DB = indexedDB.open(DBName, 4);
+  DB.onupgradeneeded = ({ target }) => {
+    const { result } = target;
+    result.createObjectStore("answers", { autoIncrement: true });
+  };
+
+  DB.onsuccess = () => {
+    getNextQuestion({
+      function: (Qtitle, c, options, text, l, isInformation) => {
+        correct = c;
+        texts = text;
+        title = Qtitle;
+        last = l;
+        information = isInformation;
+      },
+    });
+  };
+
+  $(".form").classList.remove("d-none");
+  $(".card-body").classList.remove("landing-screen");
+  $(".card-body > p").classList.add("d-none");
+
+  start = undefined;
+};
+
 function saveAnswer() {
   const answer = $(`[name=input-q${data.index}]`, (result) => {
     try {
@@ -271,6 +300,10 @@ function showResult() {
 }
 
 if (Number(DBName) && +DBName != 0) {
+  $(".form").classList.remove("d-none");
+  $(".card-body").classList.remove("landing-screen");
+  $(".card-body > p").classList.add("d-none");
+
   DB = indexedDB.open(DBName, 4);
   DB.onsuccess = () => {
     const transaction = DB.result.transaction(["answers"], "readwrite"),
@@ -308,26 +341,20 @@ if (Number(DBName) && +DBName != 0) {
     };
   };
 } else {
-  DBName = Math.random() * Math.random() * Math.PI * 1000 + 10;
-  localStorage.setItem("solved", DBName);
+  $(".card-title").innerText = config.name || "";
+  $(".card-subtitle").innerText = config.author || "";
 
-  DB = indexedDB.open(DBName, 4);
-  DB.onupgradeneeded = ({ target }) => {
-    const { result } = target;
-    result.createObjectStore("answers", { autoIncrement: true });
-  };
+  $(".form").classList.add("d-none");
+  $(".card-body").classList.add("landing-screen");
+  $(".card-body > p").classList.remove("d-none");
 
-  DB.onsuccess = () => {
-    getNextQuestion({
-      function: (Qtitle, c, options, text, l, isInformation) => {
-        correct = c;
-        texts = text;
-        title = Qtitle;
-        last = l;
-        information = isInformation;
-      },
-    });
-  };
+  $(".card-body").addEventListener("click", () => {
+    if (typeof start !== "undefined") start();
+  });
+
+  addEventListener("keyup", (e) => {
+    if (e.code == "Space" && typeof start !== "undefined") start();
+  });
 }
 
 function offline() {
@@ -357,10 +384,6 @@ if (!navigator.onLine) {
 addEventListener("offline", () => {
   offline();
 });
-
-// addEventListener("resize", () => {
-//   window.location.reload();
-// });
 
 function get(index) {
   return answers[index - 1];

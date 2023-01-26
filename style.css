@@ -70,3 +70,8 @@ output:before {
 input[type="range"]:hover ~ output {
   opacity: 1;
 }
+
+.landing-screen {
+  text-align: center;
+  --bs-code-color : var(--bs-black)
+}
