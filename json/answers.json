@@ -1,29 +1,48 @@
 {
-    "answers": [
-        {
-            "options": "your name",
-            "error": "please don't write the example and fill the form",
-            "information": true
-        },
-        {
-            "options": [
-                "yes",
-                "no"
-            ],
-            "correct": 1,
-            "error": "please write s.th",
-            "true": "me too",
-            "false": "really you can fly !"
-        },
-        {
-            "options": [
-                "yes",
-                "no"
-            ],
-            "correct": 0,
-            "error": "please write s.th",
-            "true": "yes we're human",
-            "false": "omg you are animal"
-        }
-    ]
+  "answers": [
+    {
+      "options": "your name",
+      "error": "please don't write the example and fill the form",
+      "information": true
+    },
+    {
+      "options": "your age",
+      "error": "you must fill this field",
+      "information": true,
+      "correct": {
+        "min": 18,
+        "answer": null
+      }
+    },
+    {
+      "options": ["programming", "reading", "graphic design"],
+      "error": "you must fill this field",
+      "information": true,
+      "correct": null
+    },
+    {
+      "options": "my age",
+      "correct": {
+        "min": 1,
+        "answer": 13
+      },
+      "error": "please write s.th",
+      "true": "yes i'm 13",
+      "false": "no i'm 13"
+    },
+    {
+      "options": ["yes", "no"],
+      "correct": 1,
+      "error": "please write s.th",
+      "true": "me too",
+      "false": "really you can fly !"
+    },
+    {
+      "options": ["yes", "no"],
+      "correct": 0,
+      "error": "please write s.th",
+      "true": "yes we're human",
+      "false": "omg you are animal"
+    }
+  ]
 }

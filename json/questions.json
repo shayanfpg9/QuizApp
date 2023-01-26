@@ -1,16 +1,28 @@
 {
-    "questions": [
-        {
-            "title" : "what is your name ?",
-            "input" : "text"
-        },
-        {
-            "title": "can you fly ?",
-            "input" : "radio"
-        },
-        {
-            "title": "are you human ?",
-            "input" : "radio"
-        }
-    ]
+  "questions": [
+    {
+      "title": "what is your name ?",
+      "input": "text"
+    },
+    {
+      "title": "how old are you?",
+      "input": "range"
+    },
+    {
+      "title": "what can you do?",
+      "input": "checkbox"
+    },
+    {
+      "title": "can you guess my age?",
+      "input": "number"
+    },
+    {
+      "title": "can you fly ?",
+      "input": "radio"
+    },
+    {
+      "title": "are you human ?",
+      "input": "radio"
+    }
+  ]
 }
